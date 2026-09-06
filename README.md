@@ -16,6 +16,7 @@ Part of the [KMIT Notes](https://github.com/kmit-notes) open-source notes initia
 - [Semester](#semester)
 - [Repository Status](#repository-status)
 - [Notes and Resources](#notes-and-resources)
+- [Current Imported Content](#current-imported-content)
 - [Google Drive Resources](#google-drive-resources)
 - [Planned Structure](#planned-structure)
 - [Contributing](#contributing)
@@ -45,6 +46,19 @@ Some local archive material has been copied into this repository for Semester 2-
 The repository will eventually contain student-contributed notes, assignments, lab material, question papers, and useful references for this semester.
 
 The copied source files still need to be audited, deduplicated, and organized into the final taxonomy so the repository does not remain an unstructured file dump.
+
+## Current Imported Content
+
+The local archive currently contributed these top-level folders/files to this repository:
+
+- `ACD/`
+- `COA/`
+- `DS/`
+- `ML/`
+- `OS/`
+- `KR24 CSE II year syllabus.pdf`
+
+These names come from the archive as received. They have not yet been normalized, renamed, merged, or reviewed for duplicates.
 
 ## Google Drive Resources
 
