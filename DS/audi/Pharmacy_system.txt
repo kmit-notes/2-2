@@ -1,0 +1,324 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+// ==========================================================
+// CLASS: Medicine
+// Covers Exercise Set 1, 2, 5, 6
+// ==========================================================
+
+class Medicine {
+private:
+    string name;
+    string manufacturer;      // Exercise 1.1: Add manufacturer
+    string category;          // Exercise 1.1: Add category
+    double price;
+    int quantity;
+    string expiryDate;
+
+public:
+    // Exercise 1.1: Updated constructor
+    Medicine(string n = "Unknown",
+             string manu = "Unknown",
+             string cat = "General",
+             double p = 0.0,
+             int q = 0,
+             string exp = "2099-12-31")
+    {
+        name = n;
+        manufacturer = manu;
+        category = cat;
+        price = p;
+        quantity = q;
+        expiryDate = exp;
+
+        cout << "Medicine Created: " << name << endl;
+    }
+
+    // Exercise 2.2: Copy Constructor
+    Medicine(const Medicine& m) {
+        name = m.name;
+        manufacturer = m.manufacturer;
+        category = m.category;
+        price = m.price;
+        quantity = m.quantity;
+        expiryDate = m.expiryDate;
+    }
+
+    ~Medicine() {
+        cout << "Medicine Destroyed: " << name << endl;
+    }
+
+    // Getters
+    string getName() const { return name; }
+    string getCategory() const { return category; }
+    double getPrice() const { return price; }
+    int getQuantity() const { return quantity; }
+
+    // Setters
+    void setPrice(double p) { price = p; }
+    void setQuantity(int q) { quantity = q; }
+
+    // Exercise 1.2: Expiry check
+    bool isExpired(string currentDate) const {
+        return expiryDate < currentDate;
+    }
+
+    // Exercise 5.1: Overstock detection
+    bool isOverstocked(int threshold) const {
+        return quantity > threshold;
+    }
+
+    // Sell
+    void sell(int amount) {
+        if (amount <= quantity)
+            quantity -= amount;
+    }
+
+    void restock(int amount) {
+        quantity += amount;
+    }
+
+    void display() const {
+        cout << "\n--- Medicine Details ---\n";
+        cout << "Name: " << name << endl;
+        cout << "Manufacturer: " << manufacturer << endl;
+        cout << "Category: " << category << endl;
+        cout << "Price: $" << price << endl;
+        cout << "Quantity: " << quantity << endl;
+        cout << "Expiry: " << expiryDate << endl;
+    }
+};
+
+// ==========================================================
+// CLASS: Customer
+// Covers Exercise Set 4
+// ==========================================================
+
+class Customer {
+private:
+    string name;
+    string phone;
+    int loyaltyPoints;
+
+public:
+    Customer(string n = "Guest", string p = "000", int pts = 0) {
+        name = n;
+        phone = p;
+        loyaltyPoints = pts;
+    }
+
+    void addPoints(int pts) { loyaltyPoints += pts; }
+    void redeemPoints(int pts) {
+        if (pts <= loyaltyPoints)
+            loyaltyPoints -= pts;
+    }
+
+    void display() const {
+        cout << "Customer: " << name
+             << " | Phone: " << phone
+             << " | Points: " << loyaltyPoints << endl;
+    }
+
+    string getName() const { return name; }
+};
+
+// ==========================================================
+// CLASS: Transaction
+// Covers Exercise Set 4.2
+// ==========================================================
+
+class Transaction {
+private:
+    Customer* customer;
+    Medicine* medicine;
+    int quantity;
+    double totalAmount;
+    string date;
+
+public:
+    Transaction(Customer* c, Medicine* m, int q, string d) {
+        customer = c;
+        medicine = m;
+        quantity = q;
+        date = d;
+
+        totalAmount = m->getPrice() * q;
+        m->sell(q); // Reduce stock
+        c->addPoints(q); // Add loyalty points
+    }
+
+    void printReceipt() {
+        cout << "\n===== RECEIPT =====\n";
+        cout << "Customer: " << customer->getName() << endl;
+        cout << "Medicine: " << medicine->getName() << endl;
+        cout << "Quantity: " << quantity << endl;
+        cout << "Total: $" << totalAmount << endl;
+        cout << "Date: " << date << endl;
+    }
+};
+
+// ==========================================================
+// CLASS: Pharmacy
+// Covers Exercise Set 3 & 5
+// ==========================================================
+
+class Pharmacy {
+private:
+    string name;
+    Medicine* inventory;
+    int inventorySize;
+    int capacity;
+
+public:
+    Pharmacy(string n, int cap) {
+        name = n;
+        capacity = cap;
+        inventorySize = 0;
+        inventory = new Medicine[capacity];  // Exercise 3: dynamic array
+    }
+
+    ~Pharmacy() {
+        delete[] inventory;
+    }
+
+    // Exercise 3.1: Add Medicine
+    void addMedicine(const Medicine& m) {
+        if (inventorySize < capacity)
+            inventory[inventorySize++] = m;
+    }
+
+    // Exercise 3.2: Remove Medicine
+    bool removeMedicine(string n) {
+        for (int i = 0; i < inventorySize; i++) {
+            if (inventory[i].getName() == n) {
+                for (int j = i; j < inventorySize - 1; j++)
+                    inventory[j] = inventory[j + 1];
+                inventorySize--;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Search by name
+    Medicine* findByName(string n) {
+        for (int i = 0; i < inventorySize; i++)
+            if (inventory[i].getName() == n)
+                return &inventory[i];
+        return nullptr;
+    }
+
+    // Exercise 5.2: Most expensive
+    Medicine* getMostExpensive() {
+        if (inventorySize == 0) return nullptr;
+        int maxIndex = 0;
+        for (int i = 1; i < inventorySize; i++)
+            if (inventory[i].getPrice() >
+                inventory[maxIndex].getPrice())
+                maxIndex = i;
+        return &inventory[maxIndex];
+    }
+
+    void displayAll() {
+        for (int i = 0; i < inventorySize; i++)
+            inventory[i].display();
+    }
+};
+
+// ==========================================================
+// Exercise Set 6: Discount Functions
+// ==========================================================
+
+void applyDiscount1(Medicine m, double percent) { // Pass by value
+    m.setPrice(m.getPrice() * (1 - percent / 100));
+}
+
+void applyDiscount2(Medicine& m, double percent) { // Pass by reference
+    m.setPrice(m.getPrice() * (1 - percent / 100));
+}
+
+void applyDiscount3(Medicine* m, double percent) { // Pass by pointer
+    m->setPrice(m->getPrice() * (1 - percent / 100));
+}
+
+// ==========================================================
+// MAIN – Exercise Set 7 Menu System
+// ==========================================================
+
+int main() {
+
+    Pharmacy pharmacy("City Pharmacy", 50);
+
+    int choice;
+
+    do {
+        cout << "\n=== PHARMACY MANAGEMENT SYSTEM ===\n";
+        cout << "1. Add Medicine\n";
+        cout << "2. Remove Medicine\n";
+        cout << "3. Search Medicine\n";
+        cout << "4. Display All Medicines\n";
+        cout << "5. Apply Discount\n";
+        cout << "0. Exit\n";
+        cout << "Enter choice: ";
+        cin >> choice;
+
+        if (choice == 1) {
+            string name, manu, cat, exp;
+            double price;
+            int qty;
+
+            cout << "Name: "; cin >> name;
+            cout << "Manufacturer: "; cin >> manu;
+            cout << "Category: "; cin >> cat;
+            cout << "Price: "; cin >> price;
+            cout << "Quantity: "; cin >> qty;
+            cout << "Expiry: "; cin >> exp;
+
+            Medicine m(name, manu, cat, price, qty, exp);
+            pharmacy.addMedicine(m);
+        }
+
+        else if (choice == 2) {
+            string name;
+            cout << "Enter name to remove: ";
+            cin >> name;
+            if (pharmacy.removeMedicine(name))
+                cout << "Removed successfully\n";
+            else
+                cout << "Not found\n";
+        }
+
+        else if (choice == 3) {
+            string name;
+            cout << "Enter name: ";
+            cin >> name;
+            Medicine* m = pharmacy.findByName(name);
+            if (m != nullptr)
+                m->display();
+            else
+                cout << "Not found\n";
+        }
+
+        else if (choice == 4) {
+            pharmacy.displayAll();
+        }
+
+        else if (choice == 5) {
+            string name;
+            double percent;
+            cout << "Medicine name: ";
+            cin >> name;
+            Medicine* m = pharmacy.findByName(name);
+            if (m != nullptr) {
+                cout << "Discount %: ";
+                cin >> percent;
+                applyDiscount2(*m, percent);
+                cout << "Discount Applied\n";
+            }
+        }
+
+    } while (choice != 0);
+
+    return 0;
+}
